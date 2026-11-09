@@ -153,6 +153,8 @@ section > .wrap.bio{padding-block:72px}
 .fcard.center{cursor:default}
 .fcard.center::after{content:"";position:absolute;inset:0;border:1px solid color-mix(in srgb,var(--fg) 14%,transparent);pointer-events:none}
 .fast .fcard{transition-duration:.12s}
+.flow.dragging .fcard{transition:none}
+.flow{touch-action:pan-y}
 .arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:50;width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:color-mix(in srgb,var(--bg) 70%,transparent);color:var(--fg);display:grid;place-items:center;cursor:pointer;backdrop-filter:blur(6px)}
 .arrow:hover{border-color:var(--vu);color:var(--vu)}
 .arrow.prev{left:0}.arrow.next{right:0}
@@ -408,7 +410,7 @@ footer .wrap > div{display:flex;flex-wrap:wrap;gap:8px 18px}footer .wrap > div a
 
 <section id="clips"><div class="wrap">
   <div class="sec-head">
-    <h2>If they<br data-de="Wenn sie mich<br>fragen würden">asked me</h2>
+    <h2 data-de="Wenn sie mich<br>fragen würden">If they<br>asked me</h2>
     <p data-de="Eine Serie: wie ich einen Track für Artists produzieren würde, die ich liebe, Schicht für Schicht. Zum Anhören drüberfahren.">A series: how I'd produce a track for artists I love, layer by layer. Hover to listen.</p>
   </div>
   <div class="clips" id="clipList"></div>
@@ -416,7 +418,7 @@ footer .wrap > div{display:flex;flex-wrap:wrap;gap:8px 18px}footer .wrap > div a
 </div></section>
 
 <section id="process"><div class="wrap">
-  <div class="sec-head"><h2>How we could work<br data-de="So arbeiten wir<br>an deinem Song">on your song</h2><p data-de="Buch einen Teil oder den ganzen Weg. Von der ersten Idee bis zur fertigen Platte.">Book one part or the whole journey. From a first idea to a finished record.</p></div>
+  <div class="sec-head"><h2 data-de="So arbeiten wir<br>an deinem Song">How we could work<br>on your song</h2><p data-de="Buch einen Teil oder den ganzen Weg. Von der ersten Idee bis zur fertigen Platte.">Book one part or the whole journey. From a first idea to a finished record.</p></div>
   <ol class="steps">
     <li><h3>Songwriting</h3><p data-de="Aus deinem Voice-Memo, Text oder deiner Melodie wird ein fertiger Song mit starker Hook und klarer Struktur.">We turn your voice memo, lyric or melody into a finished song with a strong hook and structure.</p></li>
     <li><h3 data-de="Produktion">Production</h3><p data-de="Arrangement, Sounds und Instrumente. Die meisten spiele ich selbst, so bekommt dein Song eine Band ohne Band.">Arrangement, sounds and instruments. I play most of them myself, so your song gets a band without the band.</p></li>
@@ -427,7 +429,7 @@ footer .wrap > div{display:flex;flex-wrap:wrap;gap:8px 18px}footer .wrap > div a
 
 <section id="planner"><div class="wrap planner">
   <div class="planner-aside">
-    <span class="label">Project Planner</span>
+    <span class="label" data-de="Projektplaner">Project Planner</span>
     <h2 data-de="Lass uns deine<br>Platte machen">Let's make<br>your record</h2>
     <p data-de="Sechs kurze Schritte. Nichts davon verpflichtet dich zu einem Kauf. Es hilft mir einzuschätzen, ob dein Budget zu deinem Projekt passt.">Six short steps. Nothing you pick here commits you to a purchase. It helps me see whether your budget fits what your project needs.</p>
   </div>
@@ -615,17 +617,18 @@ const flow=document.getElementById("flow"),cards=SONGS.map((k,i)=>{
 const gBox=document.getElementById("genres");
 const gBtns=GENRES.map(g=>{const b=document.createElement("button");b.innerHTML=`${g}<span>${SONGS.filter(s=>s.g===g).length}</span>`;b.onclick=()=>spinTo(SONGS.findIndex(s=>s.g===g));gBox.appendChild(b);return b});
 let pos=0,spin=null;
+let fpos=null; /* fractional position while dragging */
 function layout(){
-  const w=flow.clientWidth,narrow=w<600;
+  const w=flow.clientWidth,narrow=w<600,P=fpos==null?pos:fpos;
   cards.forEach((c,i)=>{
-    const d=i-pos,a=Math.abs(d);
+    const d=i-P,a=Math.abs(d);
     const x=d*(narrow?34:26)+"%",sc=Math.max(.5,1-a*.17);
     c.style.transform=`translate(-50%,-50%) translateX(${d===0?0:(d<0?-1:1)*(narrow?38:30)*Math.min(a,1)+d*(narrow?14:16)}%) scale(${sc})`;
-    c.style.zIndex=20-a;c.style.opacity=a>3?0:1;c.style.pointerEvents=a>3?"none":"auto";
+    c.style.zIndex=20-Math.round(a*2);c.style.opacity=a>3?0:1;c.style.pointerEvents=a>3?"none":"auto";
     c.style.filter=d===0?"none":`brightness(${1-a*.22})`;
     c.classList.toggle("center",d===0);c.tabIndex=a>3?-1:0;
   });
-  const k=SONGS[pos];
+  const k=SONGS[Math.max(0,Math.min(SONGS.length-1,Math.round(P)))];
   document.getElementById("nowG").textContent=k.g;
   document.getElementById("nowT").textContent=k.t;
   document.getElementById("nowM").textContent=`${k.a} · ${k.y}`;
@@ -645,8 +648,18 @@ function spinTo(t){
 document.getElementById("prev").onclick=()=>go(pos-1);
 document.getElementById("nextSong").onclick=()=>go(pos+1);
 flow.addEventListener("keydown",e=>{if(e.key==="ArrowLeft")go(pos-1);if(e.key==="ArrowRight")go(pos+1)});
-let sx=null;flow.addEventListener("pointerdown",e=>sx=e.clientX);
-flow.addEventListener("pointerup",e=>{if(sx!==null&&Math.abs(e.clientX-sx)>40)go(pos+(e.clientX<sx?1:-1));sx=null});
+/* drag: covers follow the finger, then settle on the nearest one */
+let drag=null,moved=false;
+const unit=()=>{const c=cards[0].offsetWidth||200;return c*(flow.clientWidth<600?.52:.46)};
+flow.addEventListener("pointerdown",e=>{if(e.target.closest(".arrow"))return;clearInterval(spin);drag={x:e.clientX,y:e.clientY,p:pos,t:performance.now(),lx:e.clientX,lt:performance.now(),v:0,id:e.pointerId,axis:null};moved=false});
+flow.addEventListener("pointermove",e=>{if(!drag||e.pointerId!==drag.id)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;
+  if(!drag.axis){if(Math.abs(dx)<6&&Math.abs(dy)<6)return;drag.axis=Math.abs(dx)>Math.abs(dy)?"x":"y";if(drag.axis==="x"){flow.setPointerCapture(e.pointerId);flow.classList.add("dragging")}}
+  if(drag.axis!=="x")return;moved=true;e.preventDefault();
+  const now=performance.now();drag.v=(e.clientX-drag.lx)/Math.max(1,now-drag.lt);drag.lx=e.clientX;drag.lt=now;
+  let f=drag.p-dx/unit();const max=SONGS.length-1;if(f<0)f=f*.35;if(f>max)f=max+(f-max)*.35;fpos=f;layout()});
+function endDrag(e){if(!drag)return;if(drag.axis==="x"){const f=fpos==null?pos:fpos,fl=Math.max(-2,Math.min(2,-drag.v*1.2));let t=Math.round(f+fl);t=Math.max(0,Math.min(SONGS.length-1,t));fpos=null;flow.classList.remove("dragging");pos=t;layout()}drag=null}
+flow.addEventListener("pointerup",endDrag);flow.addEventListener("pointercancel",endDrag);
+flow.addEventListener("click",e=>{if(moved){e.stopPropagation();e.preventDefault();moved=false}},true);
 addEventListener("resize",layout);layout();window.__relayout=layout;
 document.querySelectorAll("canvas[data-cover]").forEach(c=>drawCover(c,c.dataset.cover));
 
