@@ -306,6 +306,43 @@ footer a{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transfo
 #linkview.anim .lib-face{animation:faceIn 1s cubic-bezier(.2,.7,.2,1) both}
 @keyframes faceIn{from{opacity:0;transform:scale(.8) rotate(-8deg)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.hero-media,.hero h1 .ch,.hero .label,.hero .cta-row,#linkview.anim .col > *,#linkview.anim .lib-face{animation:none}.rv-pre{opacity:1;translate:none}.ch{transition:none}}
+
+.lib-foot{text-align:center;font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--muted);margin:18px 0 0}
+footer a{white-space:nowrap}
+footer .wrap > div{display:flex;flex-wrap:wrap;gap:8px 18px}footer .wrap > div a{margin-right:0}
+.mcta{display:none}
+/* phone layout */
+@media (max-width:620px){
+  nav .wrap{padding-block:12px}
+  .brand{font-size:22px;white-space:nowrap}
+  .brand svg{width:22px;height:22px}
+  .navr .btn{display:none}
+  .lang button{padding:8px 7px;font-size:12px}
+  section > .wrap{padding-block:56px;gap:28px}
+  h2{font-size:clamp(40px,12vw,56px)}
+  .hero .wrap{padding-block:120px 36px;gap:14px}
+  .hero h1{font-size:clamp(50px,15vw,84px)}
+  .hero .label{font-size:11px;letter-spacing:.12em;line-height:1.8}
+  .hero .label .loc{display:block;font-size:0}
+  .hero .label .loc::after{content:"Wiesbaden";font-size:11px}
+  .hero .cta-row{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .hero .cta-row .btn{justify-content:center;padding:14px 10px}
+  .bio{grid-template-columns:72px minmax(0,1fr);gap:18px;align-items:start}
+  .bio-face{width:72px;height:72px}
+  .bio-quote p{font-size:18px;line-height:1.45}
+  .bio-quote figcaption{gap:4px 10px}
+  #work > .wrap{padding-block:48px;gap:18px}
+  .flow{height:clamp(240px,74vw,320px)}
+  .fcard{width:min(62vw,260px)}
+  .arrow{display:none}
+  .now h3{font-size:34px}
+  .genres{justify-content:center}
+  .genres .label{text-align:center}
+  .steps{gap:28px}
+  .sheet{padding:20px}
+  .mcta{display:flex;position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:15;translate:-50% 140%;transition:translate .45s cubic-bezier(.2,.7,.2,1);box-shadow:0 12px 30px rgba(0,0,0,.5);border-radius:999px;padding:14px 22px}
+  .mcta.show{translate:-50% 0}
+}
 </style>
 </head>
 <body>
@@ -327,7 +364,7 @@ footer a{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transfo
   <div class="hero-media"><video id="heroVid" src="media/hero.mp4" autoplay muted loop playsinline preload="auto" aria-label="Nick James playing guitar in his studio"></video></div>
   <div class="wrap">
     <h1 id="heroName">Nick <span>James<i class="notes" id="notes" aria-hidden="true"></i></span></h1>
-    <span class="label">Producer · Songwriter · Mixing-Engineer — Wiesbaden</span>
+    <span class="label">Producer · Songwriter · Mixing‑Engineer<span class="loc"> — Wiesbaden</span></span>
     <div class="cta-row"><a class="btn" href="#planner" data-de="Projekt starten">Start a project</a><a class="btn ghost" href="#work" data-de="Reinhören">Hear the work</a></div>
   </div>
 </header>
@@ -339,7 +376,7 @@ footer a{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transfo
   </div>
   <figure class="bio-quote">
     <blockquote><p data-de="Hey, ich bin Nick. Ich produziere, schreibe und mische Songs für Artists aus Pop, Indie und Alternative, vom ersten Voice-Memo bis zum fertigen Master, und die meisten Instrumente spiele ich selbst ein. Natürlich ist das ein Platzhaltertext, aber ich bin ein sehr sympathischer Typ.">Hey, I'm Nick. I produce, write and mix records for artists across pop, indie and alternative, from the first voice memo to the final master, and I play most of the instruments myself. Of course this is a placeholder text but I am a very sympathetic guy.</p></blockquote>
-    <figcaption><strong>Nick James</strong><span>Producer · Songwriter · Mixing-Engineer</span></figcaption>
+    <figcaption><strong>Nick James</strong><span>Producer · Songwriter · Mixing‑Engineer</span></figcaption>
   </figure>
 </div></section>
 
@@ -460,13 +497,15 @@ footer a{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transfo
 </div></footer>
 </div>
 
+<a class="btn mcta" id="mcta" href="#planner" data-de="Projekt starten">Start a project</a>
+
 <div id="linkview" hidden>
   <div class="lib-bg" aria-hidden="true"><video id="libVid" src="media/hero.mp4" muted loop playsinline preload="none"></video><div class="lib-glow" id="libGlow"></div></div>
   <div class="lib"><div class="col">
     <div class="lib-head">
       <img class="lib-face" src="media/portrait.jpg" alt="Nick James">
       <h1>Nick James</h1>
-      <p class="lib-sub">Producer · Songwriter · Mixing-Engineer<br><span data-de="Wiesbaden &amp; remote">Wiesbaden &amp; remote</span></p>
+      <p class="lib-sub">Producer · Songwriter · Mixing‑Engineer<br><span data-de="Wiesbaden &amp; remote">Wiesbaden &amp; remote</span></p>
     </div>
     <a class="lk primary" href="#planner"><span data-de="Lass uns sprechen">Let's talk</span><span class="k" data-de="Projekt →">Project →</span></a>
     <a class="lk" href="#top"><span>Website</span><span class="k">nickjames ↗</span></a>
@@ -640,7 +679,9 @@ document.querySelectorAll("canvas[data-cover]").forEach(c=>drawCover(c,c.dataset
 
 /* ---------- nav: transparent over the hero, solid once you scroll ---------- */
 const navEl=document.querySelector("#site nav");
-const onScroll=()=>navEl.classList.toggle("scrolled",scrollY>40);
+const mcta=document.getElementById("mcta"),plan=document.getElementById("planner");
+const onScroll=()=>{navEl.classList.toggle("scrolled",scrollY>40);
+  const pr=plan.getBoundingClientRect();mcta.classList.toggle("show",scrollY>innerHeight*.8&&pr.top>innerHeight*.9&&!document.getElementById("site").hidden)};
 addEventListener("scroll",onScroll,{passive:true});onScroll();
 
 /* ---------- bio portrait: flip to a CD, spin once, flip back ---------- */
@@ -694,7 +735,7 @@ form.addEventListener("submit",e=>{
 function route(){
   const links=location.hash==="#links";
   document.getElementById("site").hidden=links;document.getElementById("linkview").hidden=!links;
-  const lv=document.getElementById("libVid"),lvw=document.getElementById("linkview");if(links){lvw.classList.remove("anim");void lvw.offsetWidth;lvw.classList.add("anim");lv.play&&lv.play().catch(()=>{})}else if(lv.pause)lv.pause();
+  const lv=document.getElementById("libVid"),lvw=document.getElementById("linkview");const mc=document.getElementById("mcta");if(mc&&links)mc.classList.remove("show");if(links){lvw.classList.remove("anim");void lvw.offsetWidth;lvw.classList.add("anim");lv.play&&lv.play().catch(()=>{})}else if(lv.pause)lv.pause();
   document.getElementById("vs-links").classList.toggle("on",links);document.getElementById("vs-site").classList.toggle("on",!links);
   if(!links){const t=location.hash&&document.getElementById(location.hash.slice(1));if(t)t.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"})}
 }
