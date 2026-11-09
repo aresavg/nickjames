@@ -218,7 +218,15 @@ section > .wrap.bio{padding-block:72px}
 /* planner */
 .planner{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:48px}
 @media (max-width:860px){.planner{grid-template-columns:1fr}}
-.sheet{border:1px solid var(--line);background:var(--panel);padding:28px;display:grid;gap:24px;min-width:0}
+#planner{position:relative;isolation:isolate;overflow:hidden;border-top:1px solid color-mix(in srgb,var(--vu) 35%,transparent)}
+.plan-bg{position:absolute;inset:0;z-index:-1;background:url(media/room.jpg) center 60%/cover no-repeat;opacity:.85;filter:sepia(.3)}
+.plan-bg::after{content:"";position:absolute;inset:0;background:
+  radial-gradient(ellipse 55% 50% at 68% 30%,rgba(227,165,78,.28),transparent 70%),
+  linear-gradient(to bottom,var(--bg) 0%,rgba(13,11,9,.3) 20%,rgba(13,11,9,.38) 72%,var(--bg) 100%),
+  linear-gradient(to right,rgba(13,11,9,.78) 0%,rgba(13,11,9,.2) 55%,rgba(13,11,9,.35) 100%)}
+#planner .planner-aside h2{text-shadow:0 4px 30px rgba(0,0,0,.6)}
+#planner .planner-aside p{color:color-mix(in srgb,var(--fg) 78%,transparent)}
+.sheet{border:1px solid color-mix(in srgb,var(--vu) 40%,transparent);box-shadow:0 30px 80px rgba(0,0,0,.55),0 0 0 6px color-mix(in srgb,var(--bg) 40%,transparent),0 0 60px rgba(227,165,78,.12);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);background:color-mix(in srgb,var(--panel) 86%,transparent);padding:28px;display:grid;gap:24px;min-width:0}
 .counter{display:flex;align-items:center;gap:14px}
 .counter .digits{font-family:var(--mono);font-size:13px;color:var(--vu);font-variant-numeric:tabular-nums}
 .meter{flex:1;display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
@@ -429,7 +437,7 @@ footer .wrap > div{display:flex;flex-wrap:wrap;gap:8px 18px}footer .wrap > div a
   </ol>
 </div></section>
 
-<section id="planner"><div class="wrap planner">
+<section id="planner"><div class="plan-bg" aria-hidden="true"></div><div class="wrap planner">
   <div class="planner-aside">
     <span class="label" data-de="Projektplaner">Project Planner</span>
     <h2 data-de="Lass uns deine<br>Platte machen">Let's make<br>your record</h2>
